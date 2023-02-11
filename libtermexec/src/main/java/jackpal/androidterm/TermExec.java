@@ -30,7 +30,7 @@ public class TermExec {
 
     // Warning: bump the library revision, when an incompatible change happens
     static {
-        System.loadLibrary("jackpal-termexec2");
+        System.loadLibrary("main");
     }
 
     private final List<String> command;

@@ -41,6 +41,7 @@
         <activity
             android:name="Term"
             android:configChanges="keyboard|keyboardHidden|orientation"
+            android:exported="true"
             android:launchMode="singleTask"
             android:windowSoftInputMode="adjustResize|stateAlwaysVisible">
             <intent-filter>
@@ -65,7 +66,8 @@
         </activity-alias>
         <activity
             android:name="RemoteInterface"
-            android:excludeFromRecents="true">
+            android:excludeFromRecents="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="jackpal.androidterm.OPEN_NEW_WINDOW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -86,6 +88,7 @@
         <activity
             android:name="RunScript"
             android:excludeFromRecents="true"
+            android:exported="true"
             android:permission="jackpal.androidterm.permission.RUN_SCRIPT">
             <intent-filter>
                 <action android:name="jackpal.androidterm.RUN_SCRIPT" />
@@ -94,7 +97,8 @@
         </activity>
         <activity
             android:name="RunShortcut"
-            android:excludeFromRecents="true">
+            android:excludeFromRecents="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="jackpal.androidterm.RUN_SHORTCUT" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -107,7 +111,9 @@
             android:name="WindowList"
             android:label="@string/window_list" />
 
-        <service android:name="TermService">
+        <service
+            android:name="TermService"
+            android:exported="true">
             <intent-filter>
                 <action android:name="jackpal.androidterm.action.START_TERM.v1" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -117,6 +123,7 @@
         <activity
             android:name="jackpal.androidterm.shortcuts.AddShortcut"
             android:configChanges="orientation|keyboard|keyboardHidden"
+            android:exported="true"
             android:label="@string/activity_shortcut_create"
             android:launchMode="singleTop"
             android:theme="@android:style/Theme.Translucent.NoTitleBar">

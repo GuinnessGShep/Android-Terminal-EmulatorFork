@@ -21,19 +21,19 @@
 #include <sys/types.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
-#include <errno.h>
+#include <cerrno>
 #include <fcntl.h>
-#include <stdlib.h>
+#include <cstdlib>
 #include <unistd.h>
 #include <termios.h>
-#include <signal.h>
+#include <csignal>
 
 #include "termExec.h"
 
 static void android_os_Exec_setPtyWindowSize(JNIEnv *env, jobject clazz,
     jint fd, jint row, jint col, jint xpixel, jint ypixel)
 {
-    struct winsize sz;
+    struct winsize sz{};
 
     sz.ws_row = row;
     sz.ws_col = col;
@@ -59,7 +59,7 @@ static __inline__ int my_tcsetattr(int fd, const struct termios *s)
 
 static void android_os_Exec_setPtyUTF8Mode(JNIEnv *env, jobject clazz, jint fd, jboolean utf8Mode)
 {
-    struct termios tios;
+    struct termios tios{};
 
     if (my_tcgetattr(fd, &tios) != 0)
         env->ThrowNew(env->FindClass("java/io/IOException"), "Failed to get terminal attributes");

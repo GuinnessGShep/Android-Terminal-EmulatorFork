@@ -41,6 +41,7 @@ import java.util.UUID;
 
 import jackpal.androidterm.compat.ServiceForegroundCompat;
 import jackpal.androidterm.emulatorview.TermSession;
+import jackpal.androidterm.libtermexec.v1.ITerminal;
 import jackpal.androidterm.util.SessionList;
 import jackpal.androidterm.util.TermSettings;
 
@@ -55,11 +56,6 @@ public class TermService extends Service implements TermSession.FinishCallback {
 
     @Override
     public void onStart(Intent intent, int flags) {
-    }
-
-    /* This should be @Override if building with API Level >=5 */
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return COMPAT_START_STICKY;
     }
 
     @Override
@@ -94,11 +90,11 @@ public class TermService extends Service implements TermSession.FinishCallback {
         Intent notifyIntent = new Intent(this, Term.class);
         notifyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
-        notification.setLatestEventInfo(this, getText(R.string.application_terminal), getText(R.string.service_notify_text), pendingIntent);
+        //todo pending intent
+//        notification.setLatestEventInfo(this, getText(R.string.application_terminal), getText(R.string.service_notify_text), pendingIntent);
         compat.startForeground(RUNNING_NOTIFICATION, notification);
 
         Log.d(TermDebug.LOG_TAG, "TermService started");
-        return;
     }
 
     @Override
@@ -112,7 +108,6 @@ public class TermService extends Service implements TermSession.FinishCallback {
             session.finish();
         }
         mTermSessions.clear();
-        return;
     }
 
     public SessionList getSessions() {

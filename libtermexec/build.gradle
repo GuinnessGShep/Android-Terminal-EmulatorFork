@@ -7,16 +7,24 @@ android {
         minSdkVersion 4
         targetSdkVersion 33
 
-        ndk {
-            moduleName 'libjackpal-termexec2'
-            abiFilters 'all'
-            ldLibs 'log', 'c'
+//        splits {
+//            abi {
+//                enable true
+//                reset()
+//                include 'x86', 'armeabi-v7a', 'mips', 'arm64-v8a'
+//                universalApk true
+//            }
+//        }
+        externalNativeBuild {
+            cmake {
+                cppFlags ''
+            }
         }
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 
     buildTypes {
@@ -26,6 +34,12 @@ android {
         }
     }
     namespace 'jackpal.androidterm.libtermexec'
+    externalNativeBuild {
+        cmake {
+            path file('src/main/cpp/CMakeLists.txt')
+            version '3.22.1'
+        }
+    }
 }
 
 // by default recent plugin version does not copy any AIDL files "to avoid publishing too much"
@@ -41,5 +55,5 @@ android.libraryVariants.all { variant ->
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
-    implementation 'androidx.annotation:annotation:1.0.0'
+    implementation 'androidx.annotation:annotation:1.5.0'
 }

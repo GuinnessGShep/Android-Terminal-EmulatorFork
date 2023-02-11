@@ -230,7 +230,7 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
         }
 
         setContentView(R.layout.term_activity);
-        mViewFlipper = (TermViewFlipper) findViewById(VIEW_FLIPPER);
+        mViewFlipper = findViewById(VIEW_FLIPPER);
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TermDebug.LOG_TAG);
