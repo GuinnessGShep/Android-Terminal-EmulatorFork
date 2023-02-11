@@ -8,15 +8,15 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 
-public class IntentSampleActivity extends Activity
-{
-    private String mHandle;
+public class IntentSampleActivity extends Activity {
     private static final int REQUEST_WINDOW_HANDLE = 1;
+    private String mHandle;
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
         addClickListener(R.id.openNewWindow, new OnClickListener() {
@@ -26,7 +26,8 @@ public class IntentSampleActivity extends Activity
                         new Intent("jackpal.androidterm.OPEN_NEW_WINDOW");
                 intent.addCategory(Intent.CATEGORY_DEFAULT);
                 startActivity(intent);
-            }});
+            }
+        });
 
         final EditText script = (EditText) findViewById(R.id.script);
         script.setText(getString(R.string.default_script));
@@ -42,7 +43,8 @@ public class IntentSampleActivity extends Activity
                 String command = script.getText().toString();
                 intent.putExtra("jackpal.androidterm.iInitialCommand", command);
                 startActivity(intent);
-            }});
+            }
+        });
         addClickListener(R.id.runScriptSaveWindow, new OnClickListener() {
             public void onClick(View v) {
                 /* Intent for running a script in a previously opened window,
@@ -63,7 +65,8 @@ public class IntentSampleActivity extends Activity
                    You can compare it against an existing saved handle to
                    determine whether or not a new window was opened */
                 startActivityForResult(intent, REQUEST_WINDOW_HANDLE);
-            }});
+            }
+        });
     }
 
     private void addClickListener(int buttonId, OnClickListener onClickListener) {

@@ -1,10 +1,5 @@
 package jackpal.androidterm.sample.telnet;
 
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.Socket;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -20,27 +15,46 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.Socket;
+
 import jackpal.androidterm.emulatorview.EmulatorView;
 import jackpal.androidterm.emulatorview.TermSession;
 
 /**
  * This sample activity demonstrates the use of EmulatorView.
- *
+ * <p>
  * This activity also demonstrates how to set up a simple TermSession connected
  * to a local program.  The Telnet connection demonstrates a more complex case;
  * see the TelnetSession class for more details.
  */
-public class TermActivity extends Activity
-{
+public class TermActivity extends Activity {
     final private static String TAG = "TermActivity";
+    private static final int MSG_CONNECTED = 1;
+    Socket mSocket;
     private EditText mEntry;
     private EmulatorView mEmulatorView;
     private TermSession mSession;
+    /**
+     * Handler which will receive the message from the Telnet connect thread
+     * that the connection has been established.
+     */
+    Handler mHandler = new Handler() {
+        @Override
+        public void handleMessage(Message msg) {
+            if (msg.what == MSG_CONNECTED) {
+                createTelnetSession();
+            }
+        }
+    };
 
-    /** Called when the activity is first created. */
+    /**
+     * Called when the activity is first created.
+     */
     @Override
-    public void onCreate(Bundle savedInstanceState)
-    {
+    public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.term_activity);
 
@@ -244,21 +258,6 @@ public class TermActivity extends Activity
             }
         }.start();
     }
-
-    /**
-     * Handler which will receive the message from the Telnet connect thread
-     * that the connection has been established.
-     */
-    Handler mHandler = new Handler() {
-        @Override
-        public void handleMessage(Message msg) {
-            if (msg.what == MSG_CONNECTED) {
-                createTelnetSession();
-            }
-        }
-    };
-    Socket mSocket;
-    private static final int MSG_CONNECTED = 1;
 
     /* Create the TermSession which will handle the Telnet protocol and
        terminal emulation. */

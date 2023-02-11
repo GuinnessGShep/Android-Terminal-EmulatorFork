@@ -16,8 +16,6 @@
 
 package jackpal.androidterm.emulatorview;
 
-import jackpal.androidterm.emulatorview.compat.AndroidCompat;
-
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -28,22 +26,24 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 
+import jackpal.androidterm.emulatorview.compat.AndroidCompat;
+
 
 class Bitmap4x8FontRenderer extends BaseTextRenderer {
     private final static int kCharacterWidth = 4;
     private final static int kCharacterHeight = 8;
+    private static final float BYTE_SCALE = 1.0f / 255.0f;
     private Bitmap mFont;
     private int mCurrentForeColor;
     private int mCurrentBackColor;
     private float[] mColorMatrix;
     private Paint mPaint;
-    private static final float BYTE_SCALE = 1.0f / 255.0f;
 
     public Bitmap4x8FontRenderer(Resources resources, ColorScheme scheme) {
         super(scheme);
         int fontResource = AndroidCompat.SDK <= 3 ? R.drawable.atari_small
                 : R.drawable.atari_small_nodpi;
-        mFont = BitmapFactory.decodeResource(resources,fontResource);
+        mFont = BitmapFactory.decodeResource(resources, fontResource);
         mPaint = new Paint();
         mPaint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
     }
@@ -61,9 +61,9 @@ class Bitmap4x8FontRenderer extends BaseTextRenderer {
     }
 
     public void drawTextRun(Canvas canvas, float x, float y,
-            int lineOffset, int runWidth, char[] text, int index, int count,
-            boolean selectionStyle, int textStyle,
-            int cursorOffset, int cursorIndex, int cursorIncr, int cursorWidth, int cursorMode) {
+                            int lineOffset, int runWidth, char[] text, int index, int count,
+                            boolean selectionStyle, int textStyle,
+                            int cursorOffset, int cursorIndex, int cursorIncr, int cursorWidth, int cursorMode) {
         int foreColor = TextStyle.decodeForeColor(textStyle);
         int backColor = TextStyle.decodeBackColor(textStyle);
         int effect = TextStyle.decodeEffect(textStyle);
@@ -101,13 +101,13 @@ class Bitmap4x8FontRenderer extends BaseTextRenderer {
 
         // The cursor is too small to show the cursor mode.
         if (lineOffset <= cursorOffset && cursorOffset < (lineOffset + count)) {
-          drawTextRunHelper(canvas, x, y, cursorOffset, text, cursorOffset-lineOffset, 1,
-                  TextStyle.ciCursorForeground, TextStyle.ciCursorBackground);
+            drawTextRunHelper(canvas, x, y, cursorOffset, text, cursorOffset - lineOffset, 1,
+                    TextStyle.ciCursorForeground, TextStyle.ciCursorBackground);
         }
     }
 
     private void drawTextRunHelper(Canvas canvas, float x, float y, int lineOffset, char[] text,
-            int index, int count, int foreColor, int backColor) {
+                                   int index, int count, int foreColor, int backColor) {
         setColorMatrix(mPalette[foreColor], mPalette[backColor]);
         int destX = (int) x + kCharacterWidth * lineOffset;
         int destY = (int) y;

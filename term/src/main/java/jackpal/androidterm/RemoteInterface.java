@@ -16,10 +16,6 @@
 
 package jackpal.androidterm;
 
-import java.io.File;
-import java.io.IOException;
-import java.util.UUID;
-
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
@@ -31,8 +27,11 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
-import jackpal.androidterm.emulatorview.TermSession;
+import java.io.File;
+import java.io.IOException;
+import java.util.UUID;
 
+import jackpal.androidterm.emulatorview.TermSession;
 import jackpal.androidterm.util.SessionList;
 import jackpal.androidterm.util.TermSettings;
 
@@ -48,7 +47,25 @@ public class RemoteInterface extends Activity {
 
     private TermService mTermService;
     private Intent mTSIntent;
-    private ServiceConnection mTSConnection = new ServiceConnection() {
+
+    /**
+     * Quote a string so it can be used as a parameter in bash and similar shells.
+     */
+    public static String quoteForBash(String s) {
+        StringBuilder builder = new StringBuilder();
+        String specialChars = "\"\\$`!";
+        builder.append('"');
+        int length = s.length();
+        for (int i = 0; i < length; i++) {
+            char c = s.charAt(i);
+            if (specialChars.indexOf(c) >= 0) {
+                builder.append('\\');
+            }
+            builder.append(c);
+        }
+        builder.append('"');
+        return builder.toString();
+    }    private ServiceConnection mTSConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             TermService.TSBinder binder = (TermService.TSBinder) service;
             mTermService = binder.getService();
@@ -112,7 +129,7 @@ public class RemoteInterface extends Activity {
         String action = myIntent.getAction();
         if (action.equals(Intent.ACTION_SEND)
                 && myIntent.hasExtra(Intent.EXTRA_STREAM)) {
-          /* "permission.RUN_SCRIPT" not required as this is merely opening a new window. */
+            /* "permission.RUN_SCRIPT" not required as this is merely opening a new window. */
             Object extraStream = myIntent.getExtras().get(Intent.EXTRA_STREAM);
             if (extraStream instanceof Uri) {
                 String path = ((Uri) extraStream).getPath();
@@ -126,25 +143,6 @@ public class RemoteInterface extends Activity {
         }
 
         finish();
-    }
-
-    /**
-     *  Quote a string so it can be used as a parameter in bash and similar shells.
-     */
-    public static String quoteForBash(String s) {
-        StringBuilder builder = new StringBuilder();
-        String specialChars = "\"\\$`!";
-        builder.append('"');
-        int length = s.length();
-        for (int i = 0; i < length; i++) {
-            char c = s.charAt(i);
-            if (specialChars.indexOf(c) >= 0) {
-                builder.append('\\');
-            }
-            builder.append(c);
-        }
-        builder.append('"');
-        return builder.toString();
     }
 
     protected String openNewWindow(String iInitialCommand) {
@@ -213,4 +211,6 @@ public class RemoteInterface extends Activity {
 
         return handle;
     }
+
+
 }

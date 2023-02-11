@@ -69,10 +69,11 @@ The Android Developer Console Publishing UI is error prone:
 
 8) Click on the "Save" button
 
-9) Visit https://play.google.com/apps/publish and verify that the new version is listed as the current version.
+9) Visit https://play.google.com/apps/publish and verify that the new version is listed as the
+   current version.
 
 10) Verify that Google Play Store is serving the new version
-(check the "What's New" portion.)
+    (check the "What's New" portion.)
 
 https://play.google.com/store/apps/details?id=jackpal.androidterm
 
