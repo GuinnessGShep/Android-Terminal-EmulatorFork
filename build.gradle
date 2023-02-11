@@ -1,16 +1,13 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
-task wrapper (type:Wrapper) {
-    gradleVersion = '2.2.1'
-    distributionUrl = 'https://services.gradle.org/distributions/gradle-2.2.1-all.zip'
-}
 
 buildscript {
     repositories {
         jcenter()
         mavenCentral()
+        google()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:1.0.0'
+        classpath 'com.android.tools.build:gradle:7.3.0'
         classpath 'com.jakewharton.sdkmanager:gradle-plugin:0.12.0'
     }
 }
@@ -18,6 +15,8 @@ buildscript {
 allprojects {
     repositories {
         jcenter()
+        mavenCentral()
+        google()
     }
 }
 
