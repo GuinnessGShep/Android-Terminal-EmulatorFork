@@ -6,8 +6,6 @@ android {
     defaultConfig {
         minSdkVersion 4
         targetSdkVersion 33
-        versionCode 1
-        versionName "1.0"
 
         ndk {
             moduleName 'libjackpal-termexec2'
@@ -27,6 +25,7 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+    namespace 'jackpal.androidterm.libtermexec'
 }
 
 // by default recent plugin version does not copy any AIDL files "to avoid publishing too much"
