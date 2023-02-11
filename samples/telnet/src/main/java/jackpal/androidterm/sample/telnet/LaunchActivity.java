@@ -24,27 +24,23 @@ public class LaunchActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.launch_activity);
         final Context context = this;
-        addClickListener(R.id.launchLocal, new OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(context, TermActivity.class);
-                intent.putExtra("type", "local");
-                startActivity(intent);
-            }
+        addClickListener(R.id.launchLocal, v -> {
+            Intent intent = new Intent(context, TermActivity.class);
+            intent.putExtra("type", "local");
+            startActivity(intent);
         });
 
-        final EditText hostEdit = (EditText) findViewById(R.id.hostname);
-        addClickListener(R.id.launchTelnet, new OnClickListener() {
-            public void onClick(View v) {
-                Intent intent = new Intent(context, TermActivity.class);
-                intent.putExtra("type", "telnet");
-                String hostname = hostEdit.getText().toString();
-                intent.putExtra("host", hostname);
-                startActivity(intent);
-            }
+        final EditText hostEdit = findViewById(R.id.hostname);
+        addClickListener(R.id.launchTelnet, v -> {
+            Intent intent = new Intent(context, TermActivity.class);
+            intent.putExtra("type", "telnet");
+            String hostname = hostEdit.getText().toString();
+            intent.putExtra("host", hostname);
+            startActivity(intent);
         });
     }
 
     private void addClickListener(int buttonId, OnClickListener onClickListener) {
-        ((Button) findViewById(buttonId)).setOnClickListener(onClickListener);
+        findViewById(buttonId).setOnClickListener(onClickListener);
     }
 }

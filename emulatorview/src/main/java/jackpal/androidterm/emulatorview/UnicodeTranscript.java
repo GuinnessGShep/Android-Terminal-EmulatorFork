@@ -53,17 +53,17 @@ class UnicodeTranscript {
      */
     static final int HANGUL_CONJOINING_MIN_SDK = 16;
     private static final String TAG = "UnicodeTranscript";
-    private Object[] mLines;
-    private StyleRow[] mColor;
-    private boolean[] mLineWrap;
-    private int mTotalRows;
+    private final Object[] mLines;
+    private final StyleRow[] mColor;
+    private final boolean[] mLineWrap;
+    private final int mTotalRows;
     private int mScreenRows;
-    private int mColumns;
+    private final int mColumns;
     private int mActiveTranscriptRows = 0;
-    private int mDefaultStyle = 0;
+    private int mDefaultStyle;
     private int mScreenFirstRow = 0;
     private char[] tmpLine;
-    private StyleRow tmpColor;
+    private final StyleRow tmpColor;
 
     public UnicodeTranscript(int columns, int totalRows, int screenRows, int defaultStyle) {
         mColumns = columns;
@@ -458,8 +458,6 @@ class UnicodeTranscript {
         lines[blankRow] = null;
         color[blankRow] = new StyleRow(style, mColumns);
         lineWrap[blankRow] = false;
-
-        return;
     }
 
     /**
@@ -546,7 +544,6 @@ class UnicodeTranscript {
                         }
                         if (Character.isHighSurrogate(tmp[i])) {
                             cHigh = tmp[i];
-                            continue;
                         } else if (Character.isLowSurrogate(tmp[i])) {
                             int codePoint = Character.toCodePoint(cHigh, tmp[i]);
                             setChar(dx + x, extDstRow, codePoint);

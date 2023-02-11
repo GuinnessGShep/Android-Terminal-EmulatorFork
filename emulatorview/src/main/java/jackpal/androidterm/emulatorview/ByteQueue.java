@@ -22,7 +22,7 @@ package jackpal.androidterm.emulatorview;
  */
 
 class ByteQueue {
-    private byte[] mBuffer;
+    private final byte[] mBuffer;
     private int mHead;
     private int mStoredBytes;
 
@@ -39,13 +39,10 @@ class ByteQueue {
     public int read(byte[] buffer, int offset, int length)
             throws InterruptedException {
         if (length + offset > buffer.length) {
-            throw
-                    new IllegalArgumentException("length + offset > buffer.length");
+            throw new IllegalArgumentException("length + offset > buffer.length");
         }
         if (length < 0) {
-            throw
-                    new IllegalArgumentException("length < 0");
-
+            throw new IllegalArgumentException("length < 0");
         }
         if (length == 0) {
             return 0;
@@ -86,13 +83,10 @@ class ByteQueue {
     public int write(byte[] buffer, int offset, int length)
             throws InterruptedException {
         if (length + offset > buffer.length) {
-            throw
-                    new IllegalArgumentException("length + offset > buffer.length");
+            throw new IllegalArgumentException("length + offset > buffer.length");
         }
         if (length < 0) {
-            throw
-                    new IllegalArgumentException("length < 0");
-
+            throw new IllegalArgumentException("length < 0");
         }
         if (length == 0) {
             return 0;

@@ -634,7 +634,7 @@ class TerminalEmulator {
                 mProcessedCharCount++;
             } catch (Exception e) {
                 Log.e(EmulatorDebug.LOG_TAG, "Exception while processing character "
-                        + Integer.toString(mProcessedCharCount) + " code "
+                        + mProcessedCharCount + " code "
                         + Integer.toString(b), e);
             }
         }
@@ -1762,8 +1762,6 @@ class TerminalEmulator {
      * Send a Unicode code point to the screen.
      *
      * @param c         The code point of the character to display
-     * @param foreColor The foreground color of the character
-     * @param backColor The background color of the character
      */
     private void emit(int c, int style) {
         boolean autoWrap = autoWrapEnabled();

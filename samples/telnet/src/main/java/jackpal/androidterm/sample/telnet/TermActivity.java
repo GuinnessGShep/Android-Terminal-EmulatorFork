@@ -4,16 +4,16 @@ import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
 import android.text.method.TextKeyListener;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -41,7 +41,7 @@ public class TermActivity extends Activity {
      * Handler which will receive the message from the Telnet connect thread
      * that the connection has been established.
      */
-    Handler mHandler = new Handler() {
+    Handler mHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(Message msg) {
             if (msg.what == MSG_CONNECTED) {
@@ -61,48 +61,45 @@ public class TermActivity extends Activity {
         /* Text entry box at the bottom of the activity.  Note that you can
            also send input (whether from a hardware device or soft keyboard)
            directly to the EmulatorView. */
-        mEntry = (EditText) findViewById(R.id.term_entry);
-        mEntry.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-            public boolean onEditorAction(TextView v, int action, KeyEvent ev) {
-                // Ignore enter-key-up events
-                if (ev != null && ev.getAction() == KeyEvent.ACTION_UP) {
-                    return false;
-                }
-                // Don't try to send something if we're not connected yet
-                TermSession session = mSession;
-                if (mSession == null) {
-                    return true;
-                }
-
-                Editable e = (Editable) v.getText();
-                // Write to the terminal session
-                session.write(e.toString());
-                session.write('\r');
-                TextKeyListener.clear(e);
+        mEntry = findViewById(R.id.term_entry);
+        mEntry.setOnEditorActionListener((v, action, ev) -> {
+            // Ignore enter-key-up events
+            if (ev != null && ev.getAction() == KeyEvent.ACTION_UP) {
+                return false;
+            }
+            // Don't try to send something if we're not connected yet
+            TermSession session = mSession;
+            if (mSession == null) {
                 return true;
             }
+
+            Editable e = (Editable) v.getText();
+            // Write to the terminal session
+            session.write(e.toString());
+            session.write('\r');
+            TextKeyListener.clear(e);
+            return true;
         });
 
         /* Sends the content of the text entry box to the terminal, without
            sending a carriage return afterwards */
-        Button sendButton = (Button) findViewById(R.id.term_entry_send);
-        sendButton.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                // Don't try to send something if we're not connected yet
-                TermSession session = mSession;
-                if (mSession == null) {
-                    return;
-                }
-                Editable e = (Editable) mEntry.getText();
-                session.write(e.toString());
-                TextKeyListener.clear(e);
+        Button sendButton = findViewById(R.id.term_entry_send);
+        sendButton.setOnClickListener(v -> {
+            // Don't try to send something if we're not connected yet
+            TermSession session = mSession;
+            if (mSession == null) {
+                Toast.makeText(this, "mSession == null", Toast.LENGTH_SHORT).show();
+                return;
             }
+            Editable e = mEntry.getText();
+            session.write(e.toString());
+            TextKeyListener.clear(e);
         });
 
-        /**
-         * EmulatorView setup.
+        /*
+          EmulatorView setup.
          */
-        EmulatorView view = (EmulatorView) findViewById(R.id.emulatorView);
+        EmulatorView view = findViewById(R.id.emulatorView);
         mEmulatorView = view;
 
         /* Let the EmulatorView know the screen's density. */
@@ -160,13 +157,13 @@ public class TermActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        /**
-         * Finish the TermSession when we're destroyed.  This will free
-         * resources, stop I/O threads, and close the I/O streams attached
-         * to the session.
-         *
-         * For the local session, closing the streams will kill the shell; for
-         * the Telnet session, it closes the network connection.
+        /*
+          Finish the TermSession when we're destroyed.  This will free
+          resources, stop I/O threads, and close the I/O streams attached
+          to the session.
+
+          For the local session, closing the streams will kill the shell; for
+          the Telnet session, it closes the network connection.
          */
         if (mSession != null) {
             mSession.finish();
@@ -189,9 +186,9 @@ public class TermActivity extends Activity {
                 new ProcessBuilder(execPath, "/system/bin/sh", "-");
         */
         ProcessBuilder execBuild =
-                new ProcessBuilder("/system/bin/sh", "-");
+                new ProcessBuilder("/system/bin/sh", "-i");
         execBuild.redirectErrorStream(true);
-        Process exec = null;
+        Process exec;
         try {
             exec = execBuild.start();
         } catch (Exception e) {
@@ -206,24 +203,24 @@ public class TermActivity extends Activity {
         /* You're done! */
         return session;
 
-        /**
-         * NB: You can invoke a program without using execpty or a native code
-         * method, but the results may not be what you expect, because the
-         * process will be connected to a pipe, not a tty device.  tty devices
-         * provide services such as flow control and input/output translation
-         * which many programs expect.
-         *
-         * If you do connect a program directly to a TermSession without using
-         * a tty, you should probably at a minimum translate '\r' (sent by the
-         * Enter key) to '\n' (which most programs expect as their newline
-         * input) in write(), and translate '\n' (sent by most programs to
-         * indicate a newline) to '\r\n' (which the terminal emulator needs to
-         * actually start a new line without overdrawing text or "staircase
-         * effect") in processInput(), before sending it to the terminal
-         * emulator.
-         *
-         * For an example of how to obtain and use a tty device in native code,
-         * see assets-src/execpty.c.
+        /*
+          NB: You can invoke a program without using execpty or a native code
+          method, but the results may not be what you expect, because the
+          process will be connected to a pipe, not a tty device.  tty devices
+          provide services such as flow control and input/output translation
+          which many programs expect.
+
+          If you do connect a program directly to a TermSession without using
+          a tty, you should probably at a minimum translate '\r' (sent by the
+          Enter key) to '\n' (which most programs expect as their newline
+          input) in write(), and translate '\n' (sent by most programs to
+          indicate a newline) to '\r\n' (which the terminal emulator needs to
+          actually start a new line without overdrawing text or "staircase
+          effect") in processInput(), before sending it to the terminal
+          emulator.
+
+          For an example of how to obtain and use a tty device in native code,
+          see assets-src/execpty.c.
          */
     }
 
@@ -246,8 +243,7 @@ public class TermActivity extends Activity {
             public void run() {
                 // Connect to the server
                 try {
-                    Socket socket = new Socket(hostname, portNum);
-                    mSocket = socket;
+                    mSocket = new Socket(hostname, portNum);
                 } catch (IOException e) {
                     Log.e(TAG, "Could not create socket", e);
                     return;

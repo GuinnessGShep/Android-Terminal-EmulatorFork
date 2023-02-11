@@ -214,7 +214,7 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
     /**
      * Called by the TermSession when the contents of the view need updating
      */
-    private UpdateCallback mUpdateNotify = new UpdateCallback() {
+    private final UpdateCallback mUpdateNotify = new UpdateCallback() {
         public void onUpdate() {
             if (mIsSelectingText) {
                 int rowShift = mEmulator.getScrollCounter();
@@ -297,7 +297,10 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
             lineLen = line.length;
         } else {
             // The end of the valid data is marked by a NUL character
-            for (lineLen = 0; line[lineLen] != 0; ++lineLen) ;
+            lineLen = 0;
+            while (line[lineLen] != 0) {
+                ++lineLen;
+            }
         }
 
         SpannableStringBuilder textToLinkify = new SpannableStringBuilder(new String(line, 0, lineLen));
@@ -322,7 +325,10 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
                 lineLen = line.length;
             } else {
                 // The end of the valid data is marked by a NUL character
-                for (lineLen = 0; line[lineLen] != 0; ++lineLen) ;
+                lineLen = 0;
+                while (line[lineLen] != 0) {
+                    ++lineLen;
+                }
             }
 
             textToLinkify.append(new String(line, 0, lineLen));
@@ -349,8 +355,7 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
             }
 
             //For each URL:
-            for (int urlNum = 0; urlNum < urls.length; ++urlNum) {
-                URLSpan url = urls[urlNum];
+            for (URLSpan url : urls) {
                 int spanStart = textToLinkify.getSpanStart(url);
                 int spanEnd = textToLinkify.getSpanEnd(url);
 
@@ -645,7 +650,7 @@ public class EmulatorView extends View implements GestureDetector.OnGestureListe
                     Log.w(TAG, "getTextBeforeCursor(" + n + "," + flags + ")");
                 }
                 int len = Math.min(n, mCursor);
-                if (len <= 0 || mCursor < 0 || mCursor >= mImeBuffer.length()) {
+                if (len <= 0 || mCursor >= mImeBuffer.length()) {
                     return "";
                 }
                 return mImeBuffer.substring(mCursor - len, mCursor);

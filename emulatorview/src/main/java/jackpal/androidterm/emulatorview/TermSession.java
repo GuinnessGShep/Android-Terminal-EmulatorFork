@@ -19,6 +19,7 @@ package jackpal.androidterm.emulatorview;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -29,6 +30,7 @@ import java.nio.CharBuffer;
 import java.nio.charset.Charset;
 import java.nio.charset.CharsetEncoder;
 import java.nio.charset.CodingErrorAction;
+import java.nio.charset.StandardCharsets;
 
 /**
  * A terminal session, consisting of a VT100 terminal emulator and its
@@ -56,6 +58,7 @@ import java.nio.charset.CodingErrorAction;
  * and closes the attached I/O streams.
  */
 public class TermSession {
+    private static final String TAG = "TermSession";
     // Number of rows in the transcript
     private static final int TRANSCRIPT_ROWS = 10000;
     private static final int NEW_INPUT = 1;
@@ -71,18 +74,18 @@ public class TermSession {
     private TranscriptScreen mTranscriptScreen;
     private TerminalEmulator mEmulator;
     private boolean mDefaultUTF8Mode;
-    private Thread mReaderThread;
-    private ByteQueue mByteQueue;
-    private byte[] mReceiveBuffer;
-    private Thread mWriterThread;
-    private ByteQueue mWriteQueue;
+    private final Thread mReaderThread;
+    private final ByteQueue mByteQueue;
+    private final byte[] mReceiveBuffer;
+    private final Thread mWriterThread;
+    private final ByteQueue mWriteQueue;
     private Handler mWriterHandler;
-    private CharBuffer mWriteCharBuffer;
-    private ByteBuffer mWriteByteBuffer;
-    private CharsetEncoder mUTF8Encoder;
+    private final CharBuffer mWriteCharBuffer;
+    private final ByteBuffer mWriteByteBuffer;
+    private final CharsetEncoder mUTF8Encoder;
     private FinishCallback mFinishCallback;
     private boolean mIsRunning = false;
-    private Handler mMsgHandler = new Handler() {
+    private final Handler mMsgHandler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(Message msg) {
             if (!mIsRunning) {
@@ -91,16 +94,12 @@ public class TermSession {
             if (msg.what == NEW_INPUT) {
                 readFromProcess();
             } else if (msg.what == EOF) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        onProcessExit();
-                    }
-                });
+                new Handler(Looper.getMainLooper()).post(() -> onProcessExit());
             }
         }
     };
     private UpdateCallback mTitleChangedListener;
+
     public TermSession() {
         this(false);
     }
@@ -115,29 +114,34 @@ public class TermSession {
         mReceiveBuffer = new byte[4 * 1024];
         mByteQueue = new ByteQueue(4 * 1024);
         mReaderThread = new Thread() {
-            private byte[] mBuffer = new byte[4096];
+            private final byte[] mBuffer = new byte[4096];
 
             @Override
             public void run() {
+                Log.i(TAG, "run: start render thread");
                 try {
                     while (true) {
+                        Log.i(TAG, "run: read count");
                         int read = mTermIn.read(mBuffer);
+                        Log.i(TAG, "run: read count" + read);
                         if (read == -1) {
                             // EOF -- process exited
                             break;
                         }
                         int offset = 0;
                         while (read > 0) {
-                            int written = mByteQueue.write(mBuffer,
-                                    offset, read);
+                            int written = mByteQueue.write(mBuffer, offset, read);
                             offset += written;
                             read -= written;
-                            mMsgHandler.sendMessage(
-                                    mMsgHandler.obtainMessage(NEW_INPUT));
+                            mMsgHandler.sendMessage(mMsgHandler.obtainMessage(NEW_INPUT));
                         }
                     }
                 } catch (IOException e) {
+                    Log.e(TAG, "run: ", e);
                 } catch (InterruptedException e) {
+                    Log.e(TAG, "run: ", e);
+                } catch (Exception e) {
+                    Log.e(TAG, "run: ", e);
                 }
 
                 if (exitOnEOF) mMsgHandler.sendMessage(mMsgHandler.obtainMessage(EOF));
@@ -147,13 +151,13 @@ public class TermSession {
 
         mWriteQueue = new ByteQueue(4096);
         mWriterThread = new Thread() {
-            private byte[] mBuffer = new byte[4096];
+            private final byte[] mBuffer = new byte[4096];
 
             @Override
             public void run() {
                 Looper.prepare();
 
-                mWriterHandler = new Handler() {
+                mWriterHandler = new Handler(Looper.myLooper()) {
                     @Override
                     public void handleMessage(Message msg) {
                         if (msg.what == NEW_OUTPUT) {
@@ -214,6 +218,7 @@ public class TermSession {
      * @param rows    The number of rows in the terminal window.
      */
     public void initializeEmulator(int columns, int rows) {
+        Log.d(TAG, "initializeEmulator() called with: columns = [" + columns + "], rows = [" + rows + "]");
         mTranscriptScreen = new TranscriptScreen(columns, TRANSCRIPT_ROWS, rows, mColorScheme);
         mEmulator = new TerminalEmulator(this, mTranscriptScreen, columns, rows, mColorScheme);
         mEmulator.setDefaultUTF8Mode(mDefaultUTF8Mode);
@@ -244,11 +249,13 @@ public class TermSession {
         try {
             while (count > 0) {
                 int written = mWriteQueue.write(data, offset, count);
+                Log.i(TAG, "write: written " + written);
                 offset += written;
                 count -= written;
                 notifyNewOutput();
             }
         } catch (InterruptedException e) {
+            Log.e(TAG, "write: ", e);
         }
     }
 
@@ -459,7 +466,7 @@ public class TermSession {
     private void readFromProcess() {
         int bytesAvailable = mByteQueue.getBytesAvailable();
         int bytesToRead = Math.min(bytesAvailable, mReceiveBuffer.length);
-        int bytesRead = 0;
+        int bytesRead;
         try {
             bytesRead = mByteQueue.read(mReceiveBuffer, 0, bytesToRead);
         } catch (InterruptedException e) {

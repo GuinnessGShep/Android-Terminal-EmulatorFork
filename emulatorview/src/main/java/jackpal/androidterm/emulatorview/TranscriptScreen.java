@@ -93,8 +93,6 @@ class TranscriptScreen implements Screen {
      * @param x         X coordinate (also known as column)
      * @param y         Y coordinate (also known as row)
      * @param codePoint Unicode codepoint to store
-     * @param foreColor the foreground color
-     * @param backColor the background color
      */
     public void set(int x, int y, int codePoint, int style) {
         mData.setChar(x, y, codePoint, style);
@@ -233,12 +231,9 @@ class TranscriptScreen implements Screen {
                 displayCharWidth = width;
             }
             int style = color.get(column);
-            boolean selectionStyle = false;
-            if ((column >= selx1 || (displayCharWidth == 2 && column == selx1 - 1)) &&
-                    column <= selx2) {
-                // Draw selection:
-                selectionStyle = true;
-            }
+            boolean selectionStyle = (column >= selx1 || (displayCharWidth == 2 && column == selx1 - 1)) &&
+                    column <= selx2;
+            // Draw selection:
             if (style != lastStyle
                     || selectionStyle != lastSelectionStyle
                     || (width > 0 && forceFlushRun)) {
