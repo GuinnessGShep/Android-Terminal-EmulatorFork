@@ -37,6 +37,11 @@ import android.preference.PreferenceManager;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.core.app.NotificationChannelCompat;
+import androidx.core.app.NotificationCompat;
+import androidx.core.app.NotificationManagerCompat;
+
+import java.util.Collections;
 import java.util.UUID;
 
 import jackpal.androidterm.compat.ServiceForegroundCompat;
@@ -83,15 +88,16 @@ public class TermService extends Service implements TermSession.FinishCallback {
 
         compat = new ServiceForegroundCompat(this);
         mTermSessions = new SessionList();
-
-        /* Put the service in the foreground. */
-        Notification notification = new Notification(R.drawable.ic_stat_service_notification_icon, getText(R.string.service_notify_text), System.currentTimeMillis());
-        notification.flags |= Notification.FLAG_ONGOING_EVENT;
         Intent notifyIntent = new Intent(this, Term.class);
         notifyIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, notifyIntent, 0);
-        //todo pending intent
-//        notification.setLatestEventInfo(this, getText(R.string.application_terminal), getText(R.string.service_notify_text), pendingIntent);
+        String channelId = "term";
+        NotificationChannelCompat channelCompat = new NotificationChannelCompat.Builder(channelId, NotificationManagerCompat.IMPORTANCE_MIN).setName("term running notification").build();
+        NotificationManagerCompat managerCompat = NotificationManagerCompat.from(this);
+        if (managerCompat.getNotificationChannel(channelId) == null) {
+            managerCompat.createNotificationChannelsCompat(Collections.singletonList(channelCompat));
+        }
+        Notification notification = new NotificationCompat.Builder(this, channelCompat.getId()).setSmallIcon(R.drawable.ic_stat_service_notification_icon).setContentText(getText(R.string.service_notify_text)).setContentIntent(pendingIntent).setOngoing(true).build();
         compat.startForeground(RUNNING_NOTIFICATION, notification);
 
         Log.d(TermDebug.LOG_TAG, "TermService started");
@@ -127,32 +133,24 @@ public class TermService extends Service implements TermSession.FinishCallback {
 
     private final class RBinder extends ITerminal.Stub {
         @Override
-        public IntentSender startSession(final ParcelFileDescriptor pseudoTerminalMultiplexerFd,
-                                         final ResultReceiver callback) {
+        public IntentSender startSession(final ParcelFileDescriptor pseudoTerminalMultiplexerFd, final ResultReceiver callback) {
             final String sessionHandle = UUID.randomUUID().toString();
 
             // distinct Intent Uri and PendingIntent requestCode must be sufficient to avoid collisions
-            final Intent switchIntent = new Intent(RemoteInterface.PRIVACT_OPEN_NEW_WINDOW)
-                    .setData(Uri.parse(sessionHandle))
-                    .addCategory(Intent.CATEGORY_DEFAULT)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .putExtra(RemoteInterface.PRIVEXTRA_TARGET_WINDOW, sessionHandle);
+            final Intent switchIntent = new Intent(RemoteInterface.PRIVACT_OPEN_NEW_WINDOW).setData(Uri.parse(sessionHandle)).addCategory(Intent.CATEGORY_DEFAULT).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK).putExtra(RemoteInterface.PRIVEXTRA_TARGET_WINDOW, sessionHandle);
 
-            final PendingIntent result = PendingIntent.getActivity(getApplicationContext(), sessionHandle.hashCode(),
-                    switchIntent, 0);
+            final PendingIntent result = PendingIntent.getActivity(getApplicationContext(), sessionHandle.hashCode(), switchIntent, 0);
 
             final PackageManager pm = getPackageManager();
             final String[] pkgs = pm.getPackagesForUid(getCallingUid());
-            if (pkgs == null || pkgs.length == 0)
-                return null;
+            if (pkgs == null || pkgs.length == 0) return null;
 
             for (String packageName : pkgs) {
                 try {
                     final PackageInfo pkgInfo = pm.getPackageInfo(packageName, 0);
 
                     final ApplicationInfo appInfo = pkgInfo.applicationInfo;
-                    if (appInfo == null)
-                        continue;
+                    if (appInfo == null) continue;
 
                     final CharSequence label = pm.getApplicationLabel(appInfo);
 
@@ -162,8 +160,7 @@ public class TermService extends Service implements TermSession.FinishCallback {
                         new Handler(Looper.getMainLooper()).post(() -> {
                             GenericTermSession session = null;
                             try {
-                                final TermSettings settings = new TermSettings(getResources(),
-                                        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
+                                final TermSettings settings = new TermSettings(getResources(), PreferenceManager.getDefaultSharedPreferences(getApplicationContext()));
 
                                 session = new BoundSession(pseudoTerminalMultiplexerFd, settings, niceName);
 
@@ -175,11 +172,9 @@ public class TermService extends Service implements TermSession.FinishCallback {
 
                                 session.initializeEmulator(80, 24);
                             } catch (Exception whatWentWrong) {
-                                Log.e("TermService", "Failed to bootstrap AIDL session: "
-                                        + whatWentWrong.getMessage());
+                                Log.e("TermService", "Failed to bootstrap AIDL session: " + whatWentWrong.getMessage());
 
-                                if (session != null)
-                                    session.finish();
+                                if (session != null) session.finish();
                             }
                         });
 
