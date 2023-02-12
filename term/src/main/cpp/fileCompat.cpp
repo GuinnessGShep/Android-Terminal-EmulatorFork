@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include "common.h"
-
 #define LOG_TAG "FileCompat"
 
 #include <unistd.h>
@@ -24,12 +22,12 @@
 
 static jboolean testExecute(JNIEnv *env, jobject clazz, jstring jPathString)
 {
-    const char *pathname = NULL;
+    const char *pathname;
     int result;
 
     /* XXX We should convert CESU-8 to UTF-8 to deal with potential non-BMP
        chars in pathname */
-    pathname = env->GetStringUTFChars(jPathString, NULL);
+    pathname = env->GetStringUTFChars(jPathString, nullptr);
 
     result = access(pathname, X_OK);
 
@@ -37,16 +35,9 @@ static jboolean testExecute(JNIEnv *env, jobject clazz, jstring jPathString)
     return (result == 0);
 }
 
-static const char *classPathName = "jackpal/androidterm/compat/FileCompat$Api8OrEarlier";
-static JNINativeMethod method_table[] = {
-    { "testExecute", "(Ljava/lang/String;)Z", (void *) testExecute },
-};
-
-int init_FileCompat(JNIEnv *env) {
-    if (!registerNativeMethods(env, classPathName, method_table,
-                 sizeof(method_table) / sizeof(method_table[0]))) {
-        return JNI_FALSE;
-    }
-
-    return JNI_TRUE;
+extern "C"
+JNIEXPORT jboolean JNICALL
+Java_jackpal_androidterm_compat_FileCompat_00024Api8OrEarlier_testExecute(JNIEnv *env, jclass clazz,
+                                                                          jstring pathName) {
+    return testExecute(env, clazz, pathName);
 }

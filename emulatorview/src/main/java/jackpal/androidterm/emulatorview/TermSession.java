@@ -118,12 +118,9 @@ public class TermSession {
 
             @Override
             public void run() {
-                Log.i(TAG, "run: start render thread");
                 try {
                     while (true) {
-                        Log.i(TAG, "run: read count");
                         int read = mTermIn.read(mBuffer);
-                        Log.i(TAG, "run: read count" + read);
                         if (read == -1) {
                             // EOF -- process exited
                             break;
@@ -249,7 +246,6 @@ public class TermSession {
         try {
             while (count > 0) {
                 int written = mWriteQueue.write(data, offset, count);
-                Log.i(TAG, "write: written " + written);
                 offset += written;
                 count -= written;
                 notifyNewOutput();

@@ -30,7 +30,7 @@ public class TermExec {
 
     // Warning: bump the library revision, when an incompatible change happens
     static {
-        System.loadLibrary("main");
+        System.loadLibrary("termexec");
     }
 
     private final List<String> command;
@@ -95,8 +95,8 @@ public class TermExec {
     }
 
     public @NonNull TermExec command(List<String> command) {
-        command.clear();
-        command.addAll(command);
+        this.command.clear();
+        this.command.addAll(command);
         return this;
     }
 
@@ -118,7 +118,7 @@ public class TermExec {
             throw new IllegalStateException("Empty command!");
 
         final String cmd = command.remove(0);
-        final String[] cmdArray = command.toArray(new String[command.size()]);
+        final String[] cmdArray = command.toArray(new String[0]);
         final String[] envArray = new String[environment.size()];
         int i = 0;
         for (Map.Entry<String, String> entry : environment.entrySet()) {

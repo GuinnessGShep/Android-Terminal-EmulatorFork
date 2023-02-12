@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-#include "common.h"
-
 #define LOG_TAG "Exec"
 
 #include <sys/types.h>
@@ -30,15 +28,15 @@
 
 #include "termExec.h"
 
-static void android_os_Exec_setPtyWindowSize(JNIEnv *env, jobject clazz,
-    jint fd, jint row, jint col, jint xpixel, jint ypixel)
-{
+static void setPtyWindowSize(JNIEnv *env, jobject clazz,
+                             jint fd, jint row, jint col, jint xPixel,
+                             jint yPixel) {
     struct winsize sz{};
 
     sz.ws_row = row;
     sz.ws_col = col;
-    sz.ws_xpixel = xpixel;
-    sz.ws_ypixel = ypixel;
+    sz.ws_xpixel = xPixel;
+    sz.ws_ypixel = yPixel;
 
     // TODO: handle the situation, when the file descriptor is incompatible with TIOCSWINSZ (e.g. not from /dev/ptmx)
     if (ioctl(fd, TIOCSWINSZ, &sz) == -1)
@@ -47,18 +45,15 @@ static void android_os_Exec_setPtyWindowSize(JNIEnv *env, jobject clazz,
 
 // tcgetattr /tcsetattr are not part of Bionic at API level 4. Here's a compatible version.
 
-static __inline__ int my_tcgetattr(int fd, struct termios *s)
-{
+static __inline__ int my_tcgetattr(int fd, struct termios *s) {
     return ioctl(fd, TCGETS, s);
 }
 
-static __inline__ int my_tcsetattr(int fd, const struct termios *s)
-{
-    return ioctl(fd, TCSETS, (void *)s);
+static __inline__ int my_tcsetattr(int fd, const struct termios *s) {
+    return ioctl(fd, TCSETS, (void *) s);
 }
 
-static void android_os_Exec_setPtyUTF8Mode(JNIEnv *env, jobject clazz, jint fd, jboolean utf8Mode)
-{
+static void setPtyUtf8Mode(JNIEnv *env, jobject clazz, jint fd, jboolean utf8Mode) {
     struct termios tios{};
 
     if (my_tcgetattr(fd, &tios) != 0)
@@ -74,19 +69,15 @@ static void android_os_Exec_setPtyUTF8Mode(JNIEnv *env, jobject clazz, jint fd, 
         env->ThrowNew(env->FindClass("java/io/IOException"), "Failed to set terminal UTF-8 mode");
 }
 
-static const char *classPathName = "jackpal/androidterm/Exec";
-static JNINativeMethod method_table[] = {
-    { "setPtyWindowSizeInternal", "(IIIII)V",
-        (void*) android_os_Exec_setPtyWindowSize},
-    { "setPtyUTF8ModeInternal", "(IZ)V",
-        (void*) android_os_Exec_setPtyUTF8Mode}
-};
-
-int init_Exec(JNIEnv *env) {
-    if (!registerNativeMethods(env, classPathName, method_table,
-                 sizeof(method_table) / sizeof(method_table[0]))) {
-        return JNI_FALSE;
-    }
-
-    return JNI_TRUE;
+extern "C"
+JNIEXPORT void JNICALL
+Java_jackpal_androidterm_Exec_setPtyWindowSizeInternal(JNIEnv *env, jclass clazz, jint fd, jint row,
+                                                       jint col, jint xpixel, jint ypixel) {
+    setPtyWindowSize(env, clazz, fd, row, col, xpixel, ypixel);
+}
+extern "C"
+JNIEXPORT void JNICALL
+Java_jackpal_androidterm_Exec_setPtyUTF8ModeInternal(JNIEnv *env, jclass clazz, jint fd,
+                                                     jboolean utf8_mode) {
+    setPtyUtf8Mode(env, clazz, fd, utf8_mode);
 }

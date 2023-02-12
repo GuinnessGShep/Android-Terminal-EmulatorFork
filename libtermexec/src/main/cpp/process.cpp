@@ -28,8 +28,6 @@
 #include <csignal>
 #include <cstring>
 
-//typedef unsigned short char16_t;
-
 class String8 {
 public:
     String8() {
@@ -72,13 +70,13 @@ static int throwOutOfMemoryError(JNIEnv *env, const char *message)
     return env->ThrowNew(exClass, message);
 }
 
-static int throwIOException(JNIEnv *env, int errnum, const char *message)
+static int throwIOException(JNIEnv *env, int errnoValue, const char *message)
 {
     __android_log_print(ANDROID_LOG_ERROR, LOG_TAG, "%s errno %s(%d)",
         message, strerror(errno), errno);
 
-    if (errnum != 0) {
-        const char *s = strerror(errnum);
+    if (errnoValue != 0) {
+        const char *s = strerror(errnoValue);
         if (strcmp(s, "Unknown error") != 0)
             message = s;
     }
@@ -122,7 +120,7 @@ static void closeNonstandardFileDescriptors() {
 static int create_subprocess(JNIEnv *env, const char *cmd, char *const argv[], char *const envp[], int masterFd)
 {
     // same size as Android 1.6 libc/unistd/ptsname_r.c
-    char devname[64];
+    char devName[64];
     pid_t pid;
 
     fcntl(masterFd, F_SETFD, FD_CLOEXEC);
@@ -132,12 +130,12 @@ static int create_subprocess(JNIEnv *env, const char *cmd, char *const argv[], c
         throwIOException(env, errno, "trouble with /dev/ptmx");
         return -1;
     }
-    memset(devname, 0, sizeof(devname));
+    memset(devName, 0, sizeof(devName));
     // Early (Android 1.6) bionic versions of ptsname_r had a bug where they returned the buffer
     // instead of 0 on success.  A compatible way of telling whether ptsname_r
     // succeeded is to zero out errno and check it after the call
     errno = 0;
-    int ptsResult = ptsname_r(masterFd, devname, sizeof(devname));
+    int ptsResult = ptsname_r(masterFd, devName, sizeof(devName));
     if (ptsResult && errno) {
         throwIOException(env, errno, "ptsname_r returned error");
         return -1;
@@ -154,7 +152,7 @@ static int create_subprocess(JNIEnv *env, const char *cmd, char *const argv[], c
 
         setsid();
 
-        pts = open(devname, O_RDWR);
+        pts = open(devName, O_RDWR);
         if(pts < 0) exit(-1);
 
         ioctl(pts, TIOCSCTTY, 0);
@@ -199,7 +197,7 @@ JNIEXPORT jint JNICALL Java_jackpal_androidterm_TermExec_waitFor(JNIEnv *env, jc
 JNIEXPORT jint JNICALL Java_jackpal_androidterm_TermExec_createSubprocessInternal(JNIEnv *env, jclass clazz,
     jstring cmd, jobjectArray args, jobjectArray envVars, jint masterFd)
 {
-    const jchar* str = cmd ? env->GetStringCritical(cmd, 0) : 0;
+    const jchar* str = cmd ? env->GetStringCritical(cmd, nullptr) : nullptr;
     String8 cmd_8;
     if (str) {
         cmd_8.set(reinterpret_cast<const char16_t *>(str), env->GetStringLength(cmd));
@@ -217,7 +215,7 @@ JNIEXPORT jint JNICALL Java_jackpal_androidterm_TermExec_createSubprocessInterna
         }
         for (int i = 0; i < size; ++i) {
             auto arg = reinterpret_cast<jstring>(env->GetObjectArrayElement(args, i));
-            str = env->GetStringCritical(arg, 0);
+            str = env->GetStringCritical(arg, nullptr);
             if (!str) {
                 throwOutOfMemoryError(env, "Couldn't get argument from array");
                 return 0;

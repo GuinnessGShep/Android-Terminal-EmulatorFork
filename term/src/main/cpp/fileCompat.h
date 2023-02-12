@@ -19,6 +19,4 @@
 
 #include "jni.h"
 
-int init_FileCompat(JNIEnv *env);
-
 #endif	/* !defined(_FILECOMPAT_H) */

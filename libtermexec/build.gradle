@@ -7,14 +7,6 @@ android {
         minSdkVersion 4
         targetSdkVersion 33
 
-//        splits {
-//            abi {
-//                enable true
-//                reset()
-//                include 'x86', 'armeabi-v7a', 'mips', 'arm64-v8a'
-//                universalApk true
-//            }
-//        }
         externalNativeBuild {
             cmake {
                 cppFlags ''

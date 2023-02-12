@@ -19,6 +19,4 @@
 
 #include "jni.h"
 
-int init_Exec(JNIEnv *env);
-
 #endif	/* !defined(_TERMEXEC_H) */

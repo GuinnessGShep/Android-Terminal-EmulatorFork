@@ -16,6 +16,8 @@
 
 package jackpal.androidterm.compat;
 
+import android.annotation.SuppressLint;
+
 import java.io.File;
 
 /**
@@ -23,14 +25,15 @@ import java.io.File;
  */
 public class FileCompat {
     public static boolean canExecute(File file) {
-        if (AndroidCompat.SDK < 9) {
-            return Api8OrEarlier.canExecute(file);
-        } else {
+        if (AndroidCompat.SDK >= 9) {
             return Api9OrLater.canExecute(file);
+        } else {
+            return Api8OrEarlier.canExecute(file);
         }
     }
 
     private static class Api9OrLater {
+        @SuppressLint("NewApi")
         public static boolean canExecute(File file) {
             return file.canExecute();
         }
