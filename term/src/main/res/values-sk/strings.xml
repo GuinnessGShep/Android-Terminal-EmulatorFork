@@ -40,7 +40,7 @@
     <string name="send_control_key">Poslať ovládací kláves</string>
     <string name="send_fn_key">Poslať funkčný kláves</string>
 
-    <string name="window_title">Okno %1$d</string>
+    <string name="window_title">Okno %d</string>
 
     <string name="service_notify_text">Terminálová relácia je spustená</string>
 

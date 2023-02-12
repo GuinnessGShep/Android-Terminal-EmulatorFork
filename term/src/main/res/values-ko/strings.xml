@@ -40,7 +40,7 @@
     <string name="send_control_key">Ctrl키 입력</string>
     <string name="send_fn_key">Fn키 입력</string>
 
-    <string name="window_title">명령창 %1$d</string>
+    <string name="window_title">명령창 %d</string>
 
     <string name="service_notify_text">터미널 세션이 실행중입니다.</string>
 

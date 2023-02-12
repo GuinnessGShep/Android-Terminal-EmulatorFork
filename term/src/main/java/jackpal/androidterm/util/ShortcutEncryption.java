@@ -19,6 +19,7 @@ package jackpal.androidterm.util;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
+import android.util.Base64;
 
 import java.nio.ByteBuffer;
 import java.nio.CharBuffer;
@@ -37,7 +38,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 
-import jackpal.androidterm.compat.Base64;
 
 /**
  * Implementation of a simple authenticated encryption scheme suitable for

@@ -114,7 +114,8 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
     private PowerManager.WakeLock mWakeLock;
     private WifiManager.WifiLock mWifiLock;
     private boolean mBackKeyPressed;
-    private int mPendingPathBroadcasts = 0;    private BroadcastReceiver mPathReceiver = new BroadcastReceiver() {
+    private int mPendingPathBroadcasts = 0;
+    private final BroadcastReceiver mPathReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String path = makePathFromBundle(getResultExtras(false));
             if (intent.getAction().equals(ACTION_PATH_PREPEND_BROADCAST)) {
@@ -132,7 +133,8 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
     };
     private TermService mTermService;
     private ActionBarCompat mActionBar;
-    private int mActionBarMode = TermSettings.ACTION_BAR_MODE_NONE;    private ServiceConnection mTSConnection = new ServiceConnection() {
+    private int mActionBarMode = TermSettings.ACTION_BAR_MODE_NONE;
+    private ServiceConnection mTSConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.i(TermDebug.LOG_TAG, "Bound to TermService");
             TermService.TSBinder binder = (TermService.TSBinder) service;
@@ -153,7 +155,7 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
      * Should we use keyboard shortcuts?
      */
     private boolean mUseKeyboardShortcuts;
-    private Handler mHandler = new Handler();
+    private final Handler mHandler = new Handler();
 
     protected static TermSession createTermSession(Context context, TermSettings settings, String initialCommand) throws IOException {
         GenericTermSession session = new ShellTermSession(settings, initialCommand);
@@ -166,7 +168,9 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
     @Override
     public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
         mSettings.readPrefs(sharedPreferences);
-    }    private ActionBarCompat.OnNavigationListener mWinListItemSelected = new ActionBarCompat.OnNavigationListener() {
+    }
+
+    private final ActionBarCompat.OnNavigationListener mWinListItemSelected = new ActionBarCompat.OnNavigationListener() {
         public boolean onNavigationItemSelected(int position, long id) {
             int oldPosition = mViewFlipper.getDisplayedChild();
             if (position != oldPosition) {
@@ -199,7 +203,7 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
 
         Intent broadcast = new Intent(ACTION_PATH_BROADCAST);
         if (AndroidCompat.SDK >= 12) {
-            broadcast.addFlags(FLAG_INCLUDE_STOPPED_PACKAGES);
+            broadcast.addFlags(Intent.FLAG_INCLUDE_STOPPED_PACKAGES);
         }
         mPendingPathBroadcasts++;
         sendOrderedBroadcast(broadcast, PERMISSION_PATH_BROADCAST, mPathReceiver, null, RESULT_OK, null, null);
@@ -234,7 +238,7 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
 
         PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
         mWakeLock = pm.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, TermDebug.LOG_TAG);
-        WifiManager wm = (WifiManager) getSystemService(Context.WIFI_SERVICE);
+        WifiManager wm = (WifiManager) getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         int wifiLockMode = WifiManager.WIFI_MODE_FULL;
         if (AndroidCompat.SDK >= 12) {
             wifiLockMode = WIFI_MODE_FULL_HIGH_PERF;
@@ -317,10 +321,12 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
             }
             mViewFlipper.onResume();
         }
-    }    /**
+    }
+
+    /**
      * Intercepts keys before the view/terminal gets it.
      */
-    private View.OnKeyListener mKeyListener = new View.OnKeyListener() {
+    private final View.OnKeyListener mKeyListener = new View.OnKeyListener() {
         public boolean onKey(View v, int keyCode, KeyEvent event) {
             return backkeyInterceptor(keyCode, event) || keyboardShortcuts(keyCode, event);
         }
@@ -492,11 +498,9 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
         }
 
         int orientation = mSettings.getScreenOrientation();
-        int o = 0;
+        int o = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
         if (orientation == 0) {
             o = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED;
-        } else if (orientation == 1) {
-            o = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
         } else if (orientation == 2) {
             o = ActivityInfo.SCREEN_ORIENTATION_PORTRAIT;
         } else {
@@ -642,16 +646,10 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
         final AlertDialog.Builder b = new AlertDialog.Builder(this);
         b.setIcon(android.R.drawable.ic_dialog_alert);
         b.setMessage(R.string.confirm_window_close_message);
-        final Runnable closeWindow = new Runnable() {
-            public void run() {
-                doCloseWindow();
-            }
-        };
-        b.setPositiveButton(android.R.string.yes, new DialogInterface.OnClickListener() {
-            public void onClick(DialogInterface dialog, int id) {
-                dialog.dismiss();
-                mHandler.post(closeWindow);
-            }
+        final Runnable closeWindow = this::doCloseWindow;
+        b.setPositiveButton(android.R.string.yes, (dialog, id) -> {
+            dialog.dismiss();
+            mHandler.post(closeWindow);
         });
         b.setNegativeButton(android.R.string.no, null);
         b.show();
@@ -677,26 +675,24 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
 
     @Override
     protected void onActivityResult(int request, int result, Intent data) {
-        switch (request) {
-            case REQUEST_CHOOSE_WINDOW:
-                if (result == RESULT_OK && data != null) {
-                    int position = data.getIntExtra(EXTRA_WINDOW_ID, -2);
-                    if (position >= 0) {
-                        // Switch windows after session list is in sync, not here
-                        onResumeSelectWindow = position;
-                    } else if (position == -1) {
-                        doCreateNewWindow();
-                        onResumeSelectWindow = mTermSessions.size() - 1;
-                    }
-                } else {
-                    // Close the activity if user closed all sessions
-                    // TODO the left path will be invoked when nothing happened, but this Activity was destroyed!
-                    if (mTermSessions == null || mTermSessions.size() == 0) {
-                        mStopServiceOnFinish = true;
-                        finish();
-                    }
+        if (request == REQUEST_CHOOSE_WINDOW) {
+            if (result == RESULT_OK && data != null) {
+                int position = data.getIntExtra(EXTRA_WINDOW_ID, -2);
+                if (position >= 0) {
+                    // Switch windows after session list is in sync, not here
+                    onResumeSelectWindow = position;
+                } else if (position == -1) {
+                    doCreateNewWindow();
+                    onResumeSelectWindow = mTermSessions.size() - 1;
                 }
-                break;
+            } else {
+                // Close the activity if user closed all sessions
+                // TODO the left path will be invoked when nothing happened, but this Activity was destroyed!
+                if (mTermSessions == null || mTermSessions.size() == 0) {
+                    mStopServiceOnFinish = true;
+                    finish();
+                }
+            }
         }
     }
 
@@ -864,10 +860,7 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
     private boolean canPaste() {
         ClipboardManagerCompat clip = ClipboardManagerCompatFactory
                 .getManager(getApplicationContext());
-        if (clip.hasText()) {
-            return true;
-        }
-        return false;
+        return clip.hasText();
     }
 
     private void doPreferences() {
@@ -1077,7 +1070,7 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
     }
 
     private class EmulatorViewGestureListener extends SimpleOnGestureListener {
-        private EmulatorView view;
+        private final EmulatorView view;
 
         public EmulatorViewGestureListener(EmulatorView view) {
             this.view = view;
@@ -1116,12 +1109,6 @@ public class Term extends Activity implements UpdateCallback, SharedPreferences.
             }
         }
     }
-
-
-
-
-
-
 
 
 }

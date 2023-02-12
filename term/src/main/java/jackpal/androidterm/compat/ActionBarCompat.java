@@ -17,7 +17,10 @@
 package jackpal.androidterm.compat;
 
 import android.app.ActionBar;
+import android.os.Build;
 import android.widget.SpinnerAdapter;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * Provides ActionBar APIs.
@@ -77,24 +80,19 @@ public abstract class ActionBarCompat {
     public abstract void show();
 
     public interface OnNavigationListener {
-        public abstract boolean onNavigationItemSelected(int position, long id);
+        boolean onNavigationItemSelected(int position, long id);
     }
 }
-
+@RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
 class ActionBarApi11OrLater extends ActionBarCompat {
-    private ActionBar bar;
+    private final ActionBar bar;
 
     ActionBarApi11OrLater(Object bar) {
         this.bar = (ActionBar) bar;
     }
 
     private ActionBar.OnNavigationListener wrapOnNavigationCallback(OnNavigationListener callback) {
-        final OnNavigationListener cb = callback;
-        return new ActionBar.OnNavigationListener() {
-            public boolean onNavigationItemSelected(int position, long id) {
-                return cb.onNavigationItemSelected(position, id);
-            }
-        };
+        return callback::onNavigationItemSelected;
     }
 
     public int getDisplayOptions() {

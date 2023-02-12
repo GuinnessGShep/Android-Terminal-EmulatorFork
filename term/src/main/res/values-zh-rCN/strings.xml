@@ -40,7 +40,7 @@
     <string name="send_control_key">发送 Ctrl 键</string>
     <string name="send_fn_key">发送 Fn 键</string>
 
-    <string name="window_title">窗口 %1$d</string>
+    <string name="window_title">窗口 %d</string>
 
     <string name="service_notify_text">会话正在运行</string>
 

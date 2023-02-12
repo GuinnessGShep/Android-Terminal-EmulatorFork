@@ -40,7 +40,7 @@
     <string name="send_control_key">Send ctrl-tast</string>
     <string name="send_fn_key">Send fn-ast</string>
 
-    <string name="window_title">Vindu %1$d</string>
+    <string name="window_title">Vindu %d</string>
 
     <string name="service_notify_text">Terminaløkt kjører</string>
 

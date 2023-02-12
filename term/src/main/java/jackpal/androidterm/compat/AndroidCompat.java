@@ -16,7 +16,7 @@ import android.os.Build;
  */
 
 public class AndroidCompat {
-    public final static int SDK = getSDK();
+    public final static int SDK = Build.VERSION.SDK_INT;
 
     // The era of Holo Design
     public final static boolean V11ToV20;

@@ -17,6 +17,9 @@
 package jackpal.androidterm.compat;
 
 import android.app.Activity;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * Compatibility class for android.app.Activity
@@ -35,6 +38,7 @@ public class ActivityCompat {
         return ActionBarCompat.wrap(Api11OrLater.getActionBar(activity));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     private static class Api11OrLater {
         public static void invalidateOptionsMenu(Activity activity) {
             activity.invalidateOptionsMenu();

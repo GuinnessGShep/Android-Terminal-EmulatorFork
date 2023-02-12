@@ -24,6 +24,7 @@ import java.io.FileDescriptor;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 
 import jackpal.androidterm.emulatorview.ColorScheme;
 import jackpal.androidterm.emulatorview.TermSession;
@@ -47,11 +48,7 @@ class GenericTermSession extends TermSession {
     private String mHandle;
     private String mProcessExitMessage;
 
-    private UpdateCallback mUTF8ModeNotify = new UpdateCallback() {
-        public void onUpdate() {
-            setPtyUTF8Mode(getUTF8Mode());
-        }
-    };
+    private final UpdateCallback mUTF8ModeNotify = () -> setPtyUTF8Mode(getUTF8Mode());
 
     GenericTermSession(ParcelFileDescriptor mTermFd, TermSettings settings, boolean exitOnEOF) {
         super(exitOnEOF);
@@ -126,13 +123,20 @@ class GenericTermSession extends TermSession {
             finish();
         } else if (mProcessExitMessage != null) {
             try {
-                byte[] msg = ("\r\n[" + mProcessExitMessage + "]").getBytes("UTF-8");
+                byte[] msg = getBytes();
                 appendToEmulator(msg, 0, msg.length);
                 notifyUpdate();
             } catch (UnsupportedEncodingException e) {
                 // Never happens
             }
         }
+    }
+
+    @SuppressWarnings("CharsetObjectCanBeUsed")
+    private byte[] getBytes() throws UnsupportedEncodingException {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return ("\r\n[" + mProcessExitMessage + "]").getBytes(StandardCharsets.UTF_8);
+        } else return  ("\r\n[" + mProcessExitMessage + "]").getBytes("UTF-8");
     }
 
     @Override
@@ -183,13 +187,13 @@ class GenericTermSession extends TermSession {
      * Set the widow size for a given pty. Allows programs
      * connected to the pty learn how large their screen is.
      */
-    void setPtyWindowSize(int row, int col, int xpixel, int ypixel) {
+    void setPtyWindowSize(int row, int col, int xPixel, int yPixel) {
         // If the tty goes away too quickly, this may get called after it's descriptor is closed
         if (!mTermFd.getFileDescriptor().valid())
             return;
 
         try {
-            Exec.setPtyWindowSizeInternal(getIntFd(mTermFd), row, col, xpixel, ypixel);
+            Exec.setPtyWindowSizeInternal(getIntFd(mTermFd), row, col, xPixel, yPixel);
         } catch (IOException e) {
             Log.e("exec", "Failed to set window size: " + e.getMessage());
 

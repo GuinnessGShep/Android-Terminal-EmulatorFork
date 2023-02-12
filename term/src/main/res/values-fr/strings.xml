@@ -41,7 +41,7 @@
     <string name="send_control_key">Touche Control</string>
     <string name="send_fn_key">Touche Fonction</string>
 
-    <string name="window_title">Fenêtre %1$d</string>
+    <string name="window_title">Fenêtre %d</string>
 
     <string name="service_notify_text">Session terminal en cours d\'exécution</string>
 

@@ -40,7 +40,7 @@
     <string name="send_control_key">Tecla asignada a Ctrl</string>
     <string name="send_fn_key">Tecla asignada a FN</string>
 
-    <string name="window_title">Ventana %1$d</string>
+    <string name="window_title">Ventana %d</string>
 
     <string name="service_notify_text">Sesión de terminal en ejecución</string>
 

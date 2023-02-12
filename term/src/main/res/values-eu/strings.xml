@@ -40,7 +40,7 @@
     <string name="send_control_key">Bidali kontrol tekla</string>
     <string name="send_fn_key">Bidali fn tekla</string>
 
-    <string name="window_title">%1$d leihoa</string>
+    <string name="window_title">%d leihoa</string>
 
     <string name="service_notify_text">Terminal saioa martxan dago</string>
 

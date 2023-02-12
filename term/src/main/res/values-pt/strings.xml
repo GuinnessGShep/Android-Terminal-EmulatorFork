@@ -40,7 +40,7 @@
     <string name="send_control_key">Enviar tecla control</string>
     <string name="send_fn_key">Enviar tecla fn</string>
 
-    <string name="window_title">Janela %1$d</string>
+    <string name="window_title">Janela %d</string>
 
     <string name="service_notify_text">A sessão do Terminal está em execução</string>
 

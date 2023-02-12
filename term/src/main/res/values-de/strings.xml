@@ -39,7 +39,7 @@
 
     <string name="service_notify_text">Terminalsitzung wird ausgeführt</string>
 
-    <string name="window_title">Fenster %1$d</string>
+    <string name="window_title">Fenster %d</string>
 
     <string name="process_exit_message">Terminalsitzung beendet</string>
     <!-- Preference dialog -->

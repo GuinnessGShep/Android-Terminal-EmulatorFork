@@ -1,6 +1,9 @@
 package jackpal.androidterm.compat;
 
+import android.os.Build;
 import android.view.MenuItem;
+
+import androidx.annotation.RequiresApi;
 
 /**
  * Definitions related to android.view.MenuItem
@@ -16,7 +19,7 @@ public class MenuItemCompat {
             Api11OrLater.setShowAsAction(item, actionEnum);
         }
     }
-
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     private static class Api11OrLater {
         public static void setShowAsAction(MenuItem item, int actionEnum) {
             item.setShowAsAction(actionEnum);

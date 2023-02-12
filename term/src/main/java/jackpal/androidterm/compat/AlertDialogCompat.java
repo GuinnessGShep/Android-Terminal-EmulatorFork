@@ -3,6 +3,9 @@ package jackpal.androidterm.compat;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 public class AlertDialogCompat extends AlertDialog {
     // API 11
@@ -74,6 +77,7 @@ public class AlertDialogCompat extends AlertDialog {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     private static class Api11OrLaterBuilder extends AlertDialog.Builder {
         public Api11OrLaterBuilder(Context context) {
             super(context);

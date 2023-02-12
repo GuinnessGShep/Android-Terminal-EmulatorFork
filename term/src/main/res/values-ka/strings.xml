@@ -40,7 +40,7 @@
     <string name="send_control_key">საკონტროლო ღილაკის გაგზავნა</string>
     <string name="send_fn_key">fn ღილაკის გაგზავნა</string>
 
-    <string name="window_title">ფანჯარა %1$d</string>
+    <string name="window_title">ფანჯარა %d</string>
 
     <string name="service_notify_text">ტერმინალის სესია გაშვებულია</string>
 

@@ -16,6 +16,8 @@
 
 package jackpal.androidterm.util;
 
+import androidx.annotation.NonNull;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -27,15 +29,10 @@ import jackpal.androidterm.emulatorview.UpdateCallback;
  * An ArrayList of TermSessions which allows users to register callbacks in
  * order to be notified when the list is changed.
  */
-@SuppressWarnings("serial")
 public class SessionList extends ArrayList<TermSession> {
     LinkedList<UpdateCallback> callbacks = new LinkedList<UpdateCallback>();
     LinkedList<UpdateCallback> titleChangedListeners = new LinkedList<UpdateCallback>();
-    UpdateCallback mTitleChangedListener = new UpdateCallback() {
-        public void onUpdate() {
-            notifyTitleChanged();
-        }
-    };
+    UpdateCallback mTitleChangedListener = this::notifyTitleChanged;
 
     public SessionList() {
         super();
@@ -50,8 +47,8 @@ public class SessionList extends ArrayList<TermSession> {
         callback.onUpdate();
     }
 
-    public boolean removeCallback(UpdateCallback callback) {
-        return callbacks.remove(callback);
+    public void removeCallback(UpdateCallback callback) {
+        callbacks.remove(callback);
     }
 
     private void notifyChange() {
@@ -65,8 +62,8 @@ public class SessionList extends ArrayList<TermSession> {
         listener.onUpdate();
     }
 
-    public boolean removeTitleChangedListener(UpdateCallback listener) {
-        return titleChangedListeners.remove(listener);
+    public void removeTitleChangedListener(UpdateCallback listener) {
+        titleChangedListeners.remove(listener);
     }
 
     private void notifyTitleChanged() {
@@ -91,7 +88,7 @@ public class SessionList extends ArrayList<TermSession> {
     }
 
     @Override
-    public boolean addAll(Collection<? extends TermSession> collection) {
+    public boolean addAll(@NonNull Collection<? extends TermSession> collection) {
         boolean result = super.addAll(collection);
         for (TermSession session : collection) {
             session.setTitleChangedListener(mTitleChangedListener);
@@ -101,7 +98,7 @@ public class SessionList extends ArrayList<TermSession> {
     }
 
     @Override
-    public boolean addAll(int index, Collection<? extends TermSession> collection) {
+    public boolean addAll(int index, @NonNull Collection<? extends TermSession> collection) {
         boolean result = super.addAll(index, collection);
         for (TermSession session : collection) {
             session.setTitleChangedListener(mTitleChangedListener);

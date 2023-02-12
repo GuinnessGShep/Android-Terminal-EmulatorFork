@@ -65,7 +65,9 @@ public class RemoteInterface extends Activity {
         }
         builder.append('"');
         return builder.toString();
-    }    private ServiceConnection mTSConnection = new ServiceConnection() {
+    }
+
+    private ServiceConnection mTSConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             TermService.TSBinder binder = (TermService.TSBinder) service;
             mTermService = binder.getService();

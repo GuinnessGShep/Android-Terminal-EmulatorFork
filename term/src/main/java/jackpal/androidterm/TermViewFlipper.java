@@ -50,11 +50,11 @@ public class TermViewFlipper extends ViewFlipper implements Iterable<View> {
     private boolean mStatusBarVisible = false;
     private int mCurWidth;
     private int mCurHeight;
-    private Rect mVisibleRect = new Rect();
-    private Rect mWindowRect = new Rect();
+    private final Rect mVisibleRect = new Rect();
+    private final Rect mWindowRect = new Rect();
     private LayoutParams mChildParams = null;
     private boolean mRedoLayout = false;
-    private Runnable mCheckSize = new Runnable() {
+    private final Runnable mCheckSize = new Runnable() {
         public void run() {
             adjustChildSize();
             mHandler.postDelayed(this, SCREEN_CHECK_PERIOD);

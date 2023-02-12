@@ -40,7 +40,7 @@
     <string name="send_control_key">Invia tasto control</string>
     <string name="send_fn_key">Invia tasto fn</string>
 
-    <string name="window_title">Finestra %1$d</string>
+    <string name="window_title">Finestra %d</string>
 
     <string name="service_notify_text">Terminale in esecuzione</string>
 

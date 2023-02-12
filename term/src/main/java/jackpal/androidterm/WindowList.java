@@ -39,7 +39,7 @@ public class WindowList extends ListActivity {
     private SessionList sessions;
     private WindowListAdapter mWindowListAdapter;
     private TermService mTermService;
-    private ServiceConnection mTSConnection = new ServiceConnection() {
+    private final ServiceConnection mTSConnection = new ServiceConnection() {
         public void onServiceConnected(ComponentName className, IBinder service) {
             TermService.TSBinder binder = (TermService.TSBinder) service;
             mTermService = binder.getService();
@@ -120,14 +120,11 @@ public class WindowList extends ListActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case ActionBarCompat.ID_HOME:
-                // Action bar home button selected
-                finish();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
+        if (item.getItemId() == ActionBarCompat.ID_HOME) {// Action bar home button selected
+            finish();
+            return true;
         }
+        return super.onOptionsItemSelected(item);
     }
 
     /**

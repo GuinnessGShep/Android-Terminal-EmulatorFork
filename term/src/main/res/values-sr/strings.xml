@@ -40,7 +40,7 @@
     <string name="send_control_key">Пошаљи Цтрл унос</string>
     <string name="send_fn_key">Пошаљи Фн унос</string>
 
-    <string name="window_title">Прозор %1$d</string>
+    <string name="window_title">Прозор %d</string>
 
     <string name="service_notify_text">Сесија терминала је у току</string>
 

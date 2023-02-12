@@ -40,7 +40,7 @@
     <string name="send_control_key">Pošli klávesu control</string>
     <string name="send_fn_key">Pošli klávesu fn</string>
 
-    <string name="window_title">Okno %1$d</string>
+    <string name="window_title">Okno %d</string>
 
     <string name="service_notify_text">Terminál je spuštěný</string>
 
