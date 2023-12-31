@@ -4,8 +4,10 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 4
+        minSdkVersion 16  // Updated minimum SDK
         targetSdkVersion 33
+
+        // Other default configurations (if any)
     }
 
     buildTypes {
@@ -14,5 +16,22 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
         }
     }
+
     namespace 'jackpal.androidterm.emulatorview'
+
+    // Optional: Consider adding lintOptions to ignore certain lint checks
+    // if they are not relevant to your project
+    lintOptions {
+        // example: ignore a specific issue
+        // disable 'NewApi'
+
+        // or set a baseline file
+        // baseline file("lint-baseline.xml")
+    }
 }
+
+// Add dependencies here if needed
+dependencies {
+    // implementation 'example.dependency:version'
+}
+
