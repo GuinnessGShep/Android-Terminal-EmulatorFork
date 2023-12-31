@@ -5,7 +5,7 @@ android {
 
     defaultConfig {
         applicationId "jackpal.androidterm.sample.pathbroadcasts"
-        minSdkVersion 8  // Updated minSdkVersion
+        minSdkVersion 16  // Updated minSdkVersion
         targetSdkVersion 33
 
         ndk {
