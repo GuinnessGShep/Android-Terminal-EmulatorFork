@@ -6,7 +6,7 @@ android {
     defaultConfig {
         applicationId "jackpal.androidterm.sample.telnet"
         // Update the minSdkVersion to a more recent API level
-        minSdkVersion 21  // Suggested update, adjust as needed
+        minSdkVersion 16  // Suggested update, adjust as needed
         targetSdkVersion 33
 
         ndk {
