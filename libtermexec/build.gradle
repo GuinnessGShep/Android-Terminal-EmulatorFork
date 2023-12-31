@@ -4,7 +4,7 @@ android {
     compileSdkVersion 33
 
     defaultConfig {
-        minSdkVersion 4
+        minSdkVersion 8
         targetSdkVersion 33
 
         externalNativeBuild {
@@ -25,7 +25,14 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    lintOptions {
+        abortOnError false
+        warning 'InvalidPackage'
+    }
+
     namespace 'jackpal.androidterm.libtermexec'
+
     externalNativeBuild {
         cmake {
             path file('src/main/cpp/CMakeLists.txt')
@@ -34,18 +41,7 @@ android {
     }
 }
 
-// by default recent plugin version does not copy any AIDL files "to avoid publishing too much"
-//android.libraryVariants.all { variant ->
-//    Sync packageAidl = project.tasks.create("addPublic${variant.name.capitalize()}Aidl", Sync) { sync ->
-//        from "$project.projectDir/src/main/aidl/"
-//        into "$buildDir/intermediates/bundles/${variant.dirName}/aidl/"
-//    }
-//
-//    variant.javaCompile.dependsOn packageAidl
-//}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-
     implementation 'androidx.annotation:annotation:1.5.0'
 }
