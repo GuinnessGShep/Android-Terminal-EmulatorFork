@@ -3,14 +3,17 @@
     android:versionCode="1"
     android:versionName="1.0">
 
+    <!-- Update these to match the minSdkVersion and targetSdkVersion of your project -->
     <uses-sdk
-        android:minSdkVersion="3"
-        android:targetSdkVersion="11" />
+        android:minSdkVersion="16" <!-- Updated minSdkVersion -->
+        android:targetSdkVersion="33" /> <!-- Updated targetSdkVersion -->
     <uses-permission android:name="jackpal.androidterm.permission.RUN_SCRIPT" />
+
     <application android:label="@string/app_name">
         <activity
-            android:name="IntentSampleActivity"
-            android:label="@string/app_name">
+            android:name=".IntentSampleActivity"
+            android:label="@string/app_name"
+            android:exported="true"> <!-- Add the exported attribute -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
