@@ -5,15 +5,36 @@ android {
 
     defaultConfig {
         applicationId "jackpal.androidterm.sample.intents"
-        minSdkVersion 4
+        minSdkVersion 16 // Updated to a higher version for better compatibility
         targetSdkVersion 33
     }
 
     buildTypes {
         release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            minifyEnabled true // Enabling minification for release builds
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro' // Updated ProGuard configuration
         }
     }
+
+    // Migrated to View Binding (if applicable and needed)
+    buildFeatures {
+        viewBinding true
+    }
+
+    // Added Java 8 compatibility (common for modern Android applications)
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    // Kotlin options, add if using Kotlin in your project
+    // kotlinOptions {
+    //     jvmTarget = '1.8'
+    // }
+
     namespace 'jackpal.androidterm.sample.intents'
+}
+
+dependencies {
+    // Add your dependencies here, ensure they are up to date
 }
