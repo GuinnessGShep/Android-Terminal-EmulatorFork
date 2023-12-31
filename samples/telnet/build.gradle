@@ -5,7 +5,8 @@ android {
 
     defaultConfig {
         applicationId "jackpal.androidterm.sample.telnet"
-        minSdkVersion 4
+        // Update the minSdkVersion to a more recent API level
+        minSdkVersion 21  // Suggested update, adjust as needed
         targetSdkVersion 33
 
         ndk {
@@ -17,12 +18,17 @@ android {
     buildTypes {
         release {
             minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            // If using R8 (recommended), replace proguard-rules.txt with proguard-rules.pro
         }
     }
+
+    // Updated namespace syntax
     namespace 'jackpal.androidterm.sample.telnet'
 }
 
 dependencies {
     implementation project(':emulatorview')
+    // Consider adding necessary dependencies for updated versions and functionality
+    // For example, implementation 'androidx.core:core-ktx:1.7.0'
 }
